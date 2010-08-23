@@ -50,7 +50,7 @@ class phpBBReader(mods.Plugin):
         except IOError, e:
             if e.errno==2:
                 with io.open('lastId','w') as file:
-                        file.write('None')
+                        file.write(u'None')
                 c = None
             else:
                 raise
