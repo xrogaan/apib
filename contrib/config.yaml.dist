@@ -1,0 +1,7 @@
+servers: 
+ - !!python/tuple [irc.freenode.net, 6667]
+channels: ['#php-fr']
+nickname: apib
+quitmsg: "Does not compute"
+owners: ['xrogaan']
+password: My secret password that no ones know.
