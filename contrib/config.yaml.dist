@@ -5,3 +5,16 @@ nickname: apib
 quitmsg: "Does not compute"
 owners: ['xrogaan']
 password: My secret password that no ones know.
+
+
+# Sample:
+# format for args is [URL, Seconds between fetch, Channel to send messages]
+#
+modules:
+ - {
+     name: feedreader,
+     subname: phpBBReader,
+     args: !!python/tuple ['http://forum.naev.org/feed.php', 300, '#naev']
+   }
+
+bitly: {'login': mylogin, 'apikey': 'R_apikey' }
