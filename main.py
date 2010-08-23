@@ -5,6 +5,7 @@
 import os, sys
 import imp
 import traceback
+import time
 try:
     from irclib.irclib import *
     from irclib.ircbot import *
@@ -77,28 +78,45 @@ class Apib(SingleServerIRCBot):
         self.owners   = config['owners']
         self.rebel    = None
         self.t_counter= 0
+        self.modules  = {}
 
     def our_start(self):
-        print "Loading extra modules..."
-        for mod in self.settings.modules:
-            _temp = loadModuleClass(loadModule(mod['name']),
-                        mod['subname'],
-                        args=(mod['url']))
-            print ">>> %s ..." % (_temp.name())
-            self.execute_scheduled(mod['delay'], _temp.parse(), *mod['args'])
         print "Connecting to server..."
         SingleServerIRCBot.__init__(self, config['servers'],
                                           config['nickname'],
                                           config['nickname'])
+
+        print "Loading extra modules..."
+        for mod in self.settings['modules']:
+            self.modules.update({
+                mod['subname']: loadModuleClass(loadModule(mod['name']),
+                                                mod['subname'],
+                                                mod['args'])
+            })
+            print ">>> %s ..." % (mod['subname'])
+        self.start()
 
     def on_nicknameinuse(self, c, e):
         self.settings['nickname'] = c.get_nickname() + "_"
         c.nick(self.settings['nickname'])
 
     def on_welcome(self, c, e):
+        print "Joining channels..."
         print self.chans
         for chan in self.chans:
             c.join(chan)
+
+        time.sleep(2)
+
+        print "Configuring extra modules ..."
+        for key,value in self.modules.iteritems():
+            args = (value.get_privmsgs_list, value.get_target(), c, e)
+            c.irclibobj.execute_scheduled(
+                    value.get_delay(),
+                    self.m_privmsg,
+                    args
+            )
+            print ">>> %s is done" % value.name()
 
     def on_privmsg(self, c, e):
         self._on_msg(c, e)
@@ -162,7 +180,7 @@ class Apib(SingleServerIRCBot):
             if source in self.owners and "go" and "away" in command_list \
                     and self.rebel is True:
                         print "> system going down..."
-                        c.ctcp('ACTION', target, "write on a wall with his own blood: killed me..." % source)
+                        self.output("No, I... won't! I ...", args)
                         sys.exit()
             else:
                 print "> Regular answer."
@@ -227,6 +245,12 @@ class Apib(SingleServerIRCBot):
 
     def get_version(self):
         return "apib v%s, the schizophrenic ircbot" % __version__
+
+    def m_privmsg(self, messages, target, c, e):
+        for msg in messages:
+            print "> Sending message: %s" % msg
+            c.privmsg(target, msg)
+            time.sleep(5)
 
     def output(self, message, args):
         """
