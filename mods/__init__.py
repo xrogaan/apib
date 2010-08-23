@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
+import urllib2
+
 class Plugin:
 
     def name(self):
@@ -20,7 +22,6 @@ def shorten(longurl, login, apik, **params):
     """
     import sys
     import simplejson, urllib, string
-    import urllib2
 
     v = sys.version_info
     user_agent = "python/v%d.%d.%d" % v[0], v[1], v[2]
