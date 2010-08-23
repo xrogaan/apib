@@ -3,6 +3,7 @@
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
 import os, sys
+import imp
 import traceback
 try:
     from irclib.irclib import *
@@ -22,6 +23,31 @@ except ImportError:
 
 __version__="0.999999999999996d"
 
+def loadModule(name):
+    dir = ["./mods"]
+    modInfo = imp.find_module(name, dir)
+    try:
+        module = imp.load_module(name, *modInfo)
+    except:
+        sys.modules.pop(name, None)
+        raise
+    if module.__name__ in sys.modules:
+        sys.modules[module.__name__] = module
+    return module
+
+def loadModuleClass(module, obj, args=()):
+    try:
+        curMod = module.Classes[obj](*args)
+    except AttributeError, e:
+        if 'Class' in str(e):
+            print "I just don't know which 'Class' " \
+                  "to instanciate for module %s" % (module)
+            sys.exit(1)
+        else:
+            raise
+    curMod.classModule = module
+    return curMod
+
 def get_time():
     """
     Return time as a nice yummy string
@@ -35,24 +61,35 @@ class Apib(SingleServerIRCBot):
 
     commanddict = {
             "die": "Special command, makes the bot suicidal.",
-            "join": "Makes the bot walk through other channels. Like they want \
-            him ...",
+            "join": "Makes the bot walk through other channels. Like they want " \
+                    "him ...",
             "part": "Takes back the bot from others channels.",
             "nick": "Funny part, he could want to be Napoleon...",
-            "quitmsg": "Set the quit message. Without arguments show the \
-            current one",
+            "quitmsg": "Set the quit message. Without arguments show the " \
+                       "current one",
             "talk": "As if he did not talk enough ...",
             "owner": "With this, you could become a nurse."
     }
 
     def __init__(self, config):
-        SingleServerIRCBot.__init__(self, config['servers'], config['nickname'],
-                                          config['nickname'])
         self.settings = config
         self.chans    = config['channels']
         self.owners   = config['owners']
         self.rebel    = None
         self.t_counter= 0
+
+    def our_start(self):
+        print "Loading extra modules..."
+        for mod in self.settings.modules:
+            _temp = loadModuleClass(loadModule(mod['name']),
+                        mod['subname'],
+                        args=(mod['url']))
+            print ">>> %s ..." % (_temp.name())
+            self.execute_scheduled(mod['delay'], _temp.parse(), *mod['args'])
+        print "Connecting to server..."
+        SingleServerIRCBot.__init__(self, config['servers'],
+                                          config['nickname'],
+                                          config['nickname'])
 
     def on_nicknameinuse(self, c, e):
         self.settings['nickname'] = c.get_nickname() + "_"
@@ -286,7 +323,7 @@ if __name__ == "__main__":
     bot = Apib(config)
     print "Connection to server ..."
     try:
-        bot.start()
+        bot.our_start()
     except KeyboardInterrupt, e:
         pass
     except SystemExit, e:
