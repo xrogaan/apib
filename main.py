@@ -247,9 +247,10 @@ class Apib(SingleServerIRCBot):
         return "apib v%s, the schizophrenic ircbot" % __version__
 
     def m_privmsg(self, messages, target, c, e):
+        messages = messages()
         for msg in messages:
             print "> Sending message: %s" % msg
-            c.privmsg(target, msg)
+            c.privmsg(target, msg.encode('UTF-8'))
             time.sleep(5)
 
     def output(self, message, args):
