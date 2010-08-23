@@ -29,7 +29,7 @@ def shorten(longurl, login, apik, **params):
     params.update({
             'login': login,
             'apiKey': apik,
-            'uri': longurl
+            'uri': longurl,
             'format': params.get('format', 'json')
     })
     url = bitly_url + "?%" % urllib.urlencode(params, doseq=1)
