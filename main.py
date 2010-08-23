@@ -157,13 +157,13 @@ class Apib(SingleServerIRCBot):
 
         # Huh, you're talking to me ?!
         if command_list[0].find(self.settings['nickname']) != -1:
-            print "Somebody ask my by my nickname. Heh, they don't even know \
-                   who am I!"
-            if source in self.owners and "go" and "away" in command_list and
-            self.rebel is True:
-                print "> system going down..."
-                c.ctcp('ACTION', target, "write on a wall with his own blood: killed me..." % source)
-                sys.exit()
+            print "Somebody ask my by my nickname. Heh, they don't even know " \
+                   "who am I!"
+            if source in self.owners and "go" and "away" in command_list \
+                    and self.rebel is True:
+                        print "> system going down..."
+                        c.ctcp('ACTION', target, "write on a wall with his own blood: killed me..." % source)
+                        sys.exit()
             else:
                 print "> Regular answer."
                 print "> Counter is on %s" % self.t_counter
