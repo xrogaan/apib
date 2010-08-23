@@ -187,10 +187,15 @@ class IRC:
 
         See documentation for IRC.__init__.
         """
+        filling=[]
         t = time.time()
         while self.delayed_commands:
             if t >= self.delayed_commands[0][0]:
                 self.delayed_commands[0][1](*self.delayed_commands[0][2])
+                if (len(self.delayed_commands[0]) > 3):
+                    self.execute_scheduled(self.delayed_commands[0][3]['tick'],
+                                           self.delayed_commands[0][1],
+                                           self.delayed_commands[0][2])
                 del self.delayed_commands[0]
             else:
                 break
@@ -301,6 +306,21 @@ class IRC:
             arguments -- Arguments to give the function.
         """
         bisect.insort(self.delayed_commands, (delay+time.time(), function, arguments))
+        if self.fn_to_add_timeout:
+            self.fn_to_add_timeout(delay)
+
+    def execute_scheduled(self, delay, function, arguments=()):
+        """Execute a function at a given time
+
+        Arguments:
+
+            delay --
+
+            function -- Function to call.
+
+            arguments -- Arguments to give the function.
+        """
+        bisec.insort(self.delayed_commands, (delay+time.time(), function, arguments), {'tick': delay})
         if self.fn_to_add_timeout:
             self.fn_to_add_timeout(delay)
 
