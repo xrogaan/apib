@@ -4,7 +4,7 @@
 import feedparser
 import mods
 import time
-
+import io
 import re, htmlentitydefs
 
 def unescape(text):
@@ -43,6 +43,19 @@ class phpBBReader(mods.Plugin):
         self.url = url
         self.delay = delay
         self.channel = channel
+
+        try:
+            with io.open('lastId','r') as file:
+                c = file.read()
+        except IOError, e:
+            if e.errno==2:
+                with io.open('lastId','w') as file:
+                        file.write('None')
+                c = None
+            else:
+                raise
+        self.lastId=None
+
         pass
 
     def get_delay(self):
@@ -95,6 +108,9 @@ class phpBBReader(mods.Plugin):
 
         if firstId != None:
             self.lastId = firstId
+            with io.open('lastId','w') as file:
+                file.write(firstId)
+
         return entries
 
     def get_privmsgs_list(self, url=None, *args):
