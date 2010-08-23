@@ -187,7 +187,6 @@ class IRC:
 
         See documentation for IRC.__init__.
         """
-        filling=[]
         t = time.time()
         while self.delayed_commands:
             if t >= self.delayed_commands[0][0]:
@@ -320,7 +319,7 @@ class IRC:
 
             arguments -- Arguments to give the function.
         """
-        bisec.insort(self.delayed_commands, (delay+time.time(), function, arguments), {'tick': delay})
+        bisect.insort(self.delayed_commands, (delay+time.time(), function, arguments, {'tick': delay}))
         if self.fn_to_add_timeout:
             self.fn_to_add_timeout(delay)
 
