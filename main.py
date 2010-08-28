@@ -88,12 +88,12 @@ class Apib(SingleServerIRCBot):
 
         print "Loading extra modules..."
         for mod in self.settings['modules']:
+            print ">>> %s ..." % (mod['subname'])
             self.modules.update({
                 mod['subname']: loadModuleClass(loadModule(mod['name']),
                                                 mod['subname'],
                                                 mod['args'])
             })
-            print ">>> %s ..." % (mod['subname'])
         self.start()
 
     def on_nicknameinuse(self, c, e):
