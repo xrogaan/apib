@@ -38,11 +38,22 @@ def unescape(text):
 class phpBBReader(mods.Plugin):
 
     lastId = None
+    logMessage = "%d.%m.%y %H:%M:%S> Module(%(name)s): %(message)s"
 
-    def __init__(self, url, delay=300, channel=None):
+    def __init__(self, url, delay=300, args={}):
         self.url = url
         self.delay = delay
-        self.channel = channel
+        self.channel_ignore = []
+        if type(args) is DictType:
+            if args.has_key('channel'):
+                self.channel = args['channel']
+                del(args['channel']
+            else:
+                print "Module error: required argument `channel` is missing."
+
+            if args.has_key('ignore'):
+                self.channel_ignore.append(args['ignore'])
+                del args['ignore']
 
         try:
             with io.open('lastId','r') as file:
@@ -54,7 +65,12 @@ class phpBBReader(mods.Plugin):
                 c = None
             else:
                 raise
-        self.lastId=None
+
+        print time.strftime(self.logMessage, time.gmtime()) % {
+                'message': "lastId set to "+c, 'name': self.name()
+        }
+
+        self.lastId=c
 
         pass
 
@@ -68,9 +84,10 @@ class phpBBReader(mods.Plugin):
         if url == None:
             url = self.url
 
-        t = time.strftime("%d.%m.%y %H:%M:%S> Module(%(name)s): Parsing feed..." , time.gmtime())
-        t = t % {'name':self.name()}
-        print t
+        print time.strftime(self.logMessage, time.gmtime()) % {
+                'name':self.name(), 'message': "Parsing feed..."
+        }
+
         self.parser = feedparser.parse(url)
 
         if self.parser.bozo != 0:
@@ -90,9 +107,31 @@ class phpBBReader(mods.Plugin):
         entries = []
 
         for entry in self.parser['entries']:
+            # We do not want to loop on a already sent data
             if self.lastId == entry.id:
                 break
-            elif firstId == None:
+
+            # Attempt to ignore designed forums
+            if len(self.channel_ignore) is not 0:
+                breakit = False
+                try:
+                    url = entry.tags[0]['scheme']
+                    fid = re.search('f=([0-9]+)$',url).groups[0]
+                except:
+                    pass
+                else:
+                    for id in self.channel_ignore:
+                        if id == fid:
+                            breakit = True
+                finally:
+                    del url
+
+                if breakit:
+                    continue
+
+            # If we don't have any id in memory, that's because there is no
+            # history
+            if firstId == None:
                 firstId = entry.id
 
             verbose = "Module(%(name)s): New message -> %(url)s" % {
@@ -111,6 +150,7 @@ class phpBBReader(mods.Plugin):
             with io.open('lastId','w') as file:
                 file.write(firstId)
 
+        entries.reverse()
         return entries
 
     def get_privmsgs_list(self, url=None, *args):
@@ -123,7 +163,7 @@ class phpBBReader(mods.Plugin):
         if len(messages)==0:
             return msg
 
-        pattern = "[Forum] %s posted in %s - %s"
+        pattern = "[off][Forum] %s posted in %s - %s"
         for p in messages:
             msg.append(pattern % (p['author'],
                                   unescape(p['title']),
