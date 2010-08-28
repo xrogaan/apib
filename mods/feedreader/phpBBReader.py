@@ -53,7 +53,12 @@ class phpBBReader(mods.Plugin):
                 print "Module error: required argument `channel` is missing."
 
             if args.has_key('ignore'):
-                self.channel_ignores.append(args['ignore'])
+                if type(args['ignore']) is ListType:
+                    for v in args['ignore']:
+                        self.channel_ignores.append(v)
+                else:
+                    self.channel_ignores.append(args['ignore'])
+                print self.channel_ignores
                 del args['ignore']
 
         try:
