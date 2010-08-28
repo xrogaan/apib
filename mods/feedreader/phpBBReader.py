@@ -44,7 +44,7 @@ class phpBBReader(mods.Plugin):
     def __init__(self, url, delay=300, args={}):
         self.url = url
         self.delay = delay
-        self.channel_ignore = []
+        self.channel_ignores = []
         if type(args) is DictType:
             if args.has_key('channel'):
                 self.channel = args['channel']
@@ -53,7 +53,7 @@ class phpBBReader(mods.Plugin):
                 print "Module error: required argument `channel` is missing."
 
             if args.has_key('ignore'):
-                self.channel_ignore.append(args['ignore'])
+                self.channel_ignores.append(args['ignore'])
                 del args['ignore']
 
         try:
@@ -68,7 +68,7 @@ class phpBBReader(mods.Plugin):
                 raise
 
         print time.strftime(self.logMessage, time.gmtime()) % {
-                'message': "lastId set to "+c, 'name': self.name()
+                'message': "lastId set to %s" % c, 'name': self.name()
         }
 
         self.lastId=c
@@ -113,21 +113,25 @@ class phpBBReader(mods.Plugin):
                 break
 
             # Attempt to ignore designed forums
-            if len(self.channel_ignore) is not 0:
+            if len(self.channel_ignores) is not 0:
                 breakit = False
                 try:
                     url = entry.tags[0]['scheme']
-                    fid = re.search('f=([0-9]+)$',url).groups[0]
+                    fid = re.search('f=([0-9]+)$',url)
+                    fid = int(fid.groups()[0])
                 except:
                     pass
                 else:
-                    for id in self.channel_ignore:
-                        if id == fid:
-                            breakit = True
+                    if fid in self.channel_ignores:
+                        breakit = True
                 finally:
                     del url
 
                 if breakit:
+                    print time.strftime(self.logMessage, time.gmtime()) % {
+                            'name':self.name(),
+                            'message': "post ignored: %d" % fid
+                    }
                     continue
 
             # If we don't have any id in memory, that's because there is no
