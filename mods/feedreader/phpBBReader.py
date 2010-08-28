@@ -44,7 +44,7 @@ class phpBBReader(mods.Plugin):
     def __init__(self, url, delay=300, args={}):
         self.url = url
         self.delay = delay
-        self.channel_ignores = []
+        self.forums_ignore = []
         if type(args) is DictType:
             if args.has_key('channel'):
                 self.channel = args['channel']
@@ -55,10 +55,9 @@ class phpBBReader(mods.Plugin):
             if args.has_key('ignore'):
                 if type(args['ignore']) is ListType:
                     for v in args['ignore']:
-                        self.channel_ignores.append(v)
+                        self.forums_ignore.append(v)
                 else:
-                    self.channel_ignores.append(args['ignore'])
-                print self.channel_ignores
+                    self.forums_ignore.append(args['ignore'])
                 del args['ignore']
 
         try:
@@ -118,7 +117,7 @@ class phpBBReader(mods.Plugin):
                 break
 
             # Attempt to ignore designed forums
-            if len(self.channel_ignores) is not 0:
+            if len(self.forums_ignore) is not 0:
                 breakit = False
                 try:
                     url = entry.tags[0]['scheme']
@@ -127,7 +126,7 @@ class phpBBReader(mods.Plugin):
                 except:
                     pass
                 else:
-                    if fid in self.channel_ignores:
+                    if fid in self.forums_ignore:
                         breakit = True
                 finally:
                     del url
