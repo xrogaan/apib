@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
+from types import *
 import feedparser
 import mods
 import time
@@ -47,7 +48,7 @@ class phpBBReader(mods.Plugin):
         if type(args) is DictType:
             if args.has_key('channel'):
                 self.channel = args['channel']
-                del(args['channel']
+                del(args['channel'])
             else:
                 print "Module error: required argument `channel` is missing."
 
