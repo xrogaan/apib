@@ -1,0 +1,10 @@
+RELEASE 0.999999999999996e
+CHANGE SINCE 0.999999999999996d:
+================================================================================
+MAJOR CHANGES:
+ * things from irc can now be mirrored to modules
+ * modules are loaded before opening sockets
+MINOR CHANGES:
+ none
+BUG FIXES:
+ none
