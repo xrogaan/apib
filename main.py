@@ -106,8 +106,6 @@ class Apib(SingleServerIRCBot):
         for chan in self.chans:
             c.join(chan)
 
-        time.sleep(2)
-
         print "Configuring extra modules ..."
         for key,value in self.modules.iteritems():
             args = (value.get_privmsgs_list, value.get_target(), c, e)

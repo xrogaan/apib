@@ -1,10 +1,12 @@
 
 
-MAJORS:
+MAJOR:
 
  * things from irc must be mirrored to modules
  * needs to know kungfu
 
-MAYBE NEVER:
+MINOR:
+
+ * (auto) transform long urls into bitly tiny urls
 
 ~~ wind ~~
