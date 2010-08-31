@@ -100,15 +100,16 @@ class Apib(SingleServerIRCBot):
                                                 mod['subname'],
                                                 mod['args'])
             })
-            self.ircobj.execute_scheduled(
-                    mod['args'][1],
-                    self.m_privmsg,
-                    (
-                        self.modules[mod['subname']].get_scheduled_output,
-                        self.modules[mod['subname']].get_target(),
-                        self.connection
-                    ))
-            print ">>> %s is done" % mod['subname']
+            if self.modules[mod['subname']].config('handle') == 'scheduled':
+                self.ircobj.execute_scheduled(
+                        mod['args'][1], # delay
+                        self.m_privmsg,
+                        (
+                            self.modules[mod['subname']].get_scheduled_output,
+                            self.modules[mod['subname']].get_target(),
+                            self.connection
+                        ))
+                print ">>> %s is scheduled" % (mod['subname'])
 
         self.start()
 
