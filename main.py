@@ -110,7 +110,7 @@ class Apib(SingleServerIRCBot):
                     ))
             print ">>> %s is done" % mod['subname']
 
-    self.start()
+        self.start()
 
     def on_nicknameinuse(self, c, e):
         self.settings['nickname'] = c.get_nickname() + "_"
