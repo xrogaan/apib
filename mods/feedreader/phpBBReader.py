@@ -47,8 +47,7 @@ class phpBBReader(mods.Plugin):
         self.forums_ignore = []
         if type(args) is DictType:
             if args.has_key('channel'):
-                self.channel = args['channel']
-                del(args['channel'])
+                self.channel = args.pop('channel')
             else:
                 print "Module error: required argument `channel` is missing."
 
@@ -56,9 +55,13 @@ class phpBBReader(mods.Plugin):
                 if type(args['ignore']) is ListType:
                     for v in args['ignore']:
                         self.forums_ignore.append(v)
+                    del args['ignore']
                 else:
-                    self.forums_ignore.append(args['ignore'])
-                del args['ignore']
+                    self.forums_ignore.append(args.pop('ignore'))
+
+            self.settings = args
+        else:
+            raise PluginError, "not well configured"
 
         try:
             with io.open('lastId','r') as file:
@@ -162,7 +165,7 @@ class phpBBReader(mods.Plugin):
         entries.reverse()
         return entries
 
-    def get_privmsgs_list(self, url=None, *args):
+    def get_scheduled_output(self, url=None, *args):
         messages = self.parse(url)
         if messages == 1:
             return None

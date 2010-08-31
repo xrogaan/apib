@@ -80,6 +80,12 @@ class Apib(SingleServerIRCBot):
         self.t_counter= 0
         self.modules  = {}
 
+    def _modules_dispatcher(self, c, e):
+        m = "on_" + e.eventtype()
+        for key,mod in self.modules.iteritems():
+            if mod.config('handle') == 'to_dispatch' and hasattr(mod, m):
+                getattr(mod, m)(c, e)
+
     def our_start(self):
         print "Connecting to server..."
         SingleServerIRCBot.__init__(self, config['servers'],
@@ -94,7 +100,17 @@ class Apib(SingleServerIRCBot):
                                                 mod['subname'],
                                                 mod['args'])
             })
-        self.start()
+            self.ircobj.execute_scheduled(
+                    mod['args'][1],
+                    self.m_privmsg,
+                    (
+                        self.modules[mod['subname']].get_scheduled_output,
+                        self.modules[mod['subname']].get_target(),
+                        self.connection
+                    ))
+            print ">>> %s is done" % mod['subname']
+
+    self.start()
 
     def on_nicknameinuse(self, c, e):
         self.settings['nickname'] = c.get_nickname() + "_"
@@ -106,15 +122,6 @@ class Apib(SingleServerIRCBot):
         for chan in self.chans:
             c.join(chan)
 
-        print "Configuring extra modules ..."
-        for key,value in self.modules.iteritems():
-            args = (value.get_privmsgs_list, value.get_target(), c, e)
-            c.irclibobj.execute_scheduled(
-                    value.get_delay(),
-                    self.m_privmsg,
-                    args
-            )
-            print ">>> %s is done" % value.name()
 
     def on_privmsg(self, c, e):
         self._on_msg(c, e)
@@ -244,12 +251,12 @@ class Apib(SingleServerIRCBot):
     def get_version(self):
         return "apib v%s, the schizophrenic ircbot" % __version__
 
-    def m_privmsg(self, messages, target, c, e):
+    def m_privmsg(self, messages, target, c):
         messages = messages()
         for msg in messages:
             print "> Sending message: %s" % msg
             c.privmsg(target, msg.encode('UTF-8'))
-            time.sleep(5)
+            time.sleep(3)
 
     def output(self, message, args):
         """

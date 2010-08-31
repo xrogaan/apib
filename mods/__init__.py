@@ -3,10 +3,20 @@
 
 import urllib2
 
+class PluginError(Exception):
+    """Represent a Plugin Exception"""
+    pass
+
 class Plugin:
+    settings = {}
 
     def name(self):
         return self.__class__.__name__
+
+    def config(self, key):
+        if self.settings.has_key(key):
+            return self.settings[key]
+
 
 
 class DontRedirect(urllib2.HTTPRedirectHandler):

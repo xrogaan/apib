@@ -1068,6 +1068,11 @@ class SimpleIRCClient:
         if hasattr(self, m):
             getattr(self, m)(c, e)
 
+        # special hack to handle modules
+        if hasattr(self, '_modules_dispatcher'):
+            self._modules_dispatcher(c, e)
+
+
     def _dcc_disconnect(self, c, e):
         self.dcc_connections.remove(c)
 
