@@ -6,35 +6,7 @@ import feedparser
 import mods
 import time
 import io
-import re, htmlentitydefs
-
-def unescape(text):
-    """
-    Removes HTML or XML character references and entities from a text string.
-    Borrowed from http://effbot.org/zone/re-sub.htm#unescape-html
-
-    @param text The HTML (or XML) source text.
-    @return The plain text, as a Unicode string, if necessary
-    """
-    def fixup(m):
-        text = m.group(0)
-        if text[:2] == "&#":
-            # character reference
-            try:
-                if text[:3] == "&#x":
-                    return unichr(int(text[3:-1], 16))
-                else:
-                    return unichr(int(text[2:-1]))
-            except ValueError:
-                pass
-        else:
-            # named entity
-            try:
-                text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
-            except KeyError:
-                pass
-        return text # leave as is
-    return re.sub("&#?\w+;", fixup, text)
+import re
 
 class phpBBReader(mods.Plugin):
 
@@ -49,7 +21,7 @@ class phpBBReader(mods.Plugin):
             if args.has_key('channel'):
                 self.channel = args.pop('channel')
             else:
-                print "Module error: required argument `channel` is missing."
+                raise mods.PluginError, "Module error: required argument `channel` is missing."
 
             if args.has_key('ignore'):
                 if type(args['ignore']) is ListType:
@@ -61,7 +33,7 @@ class phpBBReader(mods.Plugin):
 
             self.settings = args
         else:
-            raise PluginError, "not well configured"
+            raise mods.PluginError, "not well configured"
 
         try:
             with io.open('lastId','r') as file:
@@ -178,7 +150,7 @@ class phpBBReader(mods.Plugin):
         pattern = "[off][Forum] %s posted in %s - %s"
         for p in messages:
             msg.append(pattern % (p['author'],
-                                  unescape(p['title']),
+                                  mods.unescape(p['title']),
                                   p['link']))
         return msg
 
