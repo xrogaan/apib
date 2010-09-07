@@ -38,7 +38,7 @@ class kungfu(mods.Plugin):
         if self.body[0] == ':':
             pass # special commands
         elif self.settings['nickname'].lower() in self.body.lower():
-            for move, actions in moves.attack:
+            for move, actions in moves.attacks.iteritems():
                 if move in self.body:
                     handler = "process_" + move
                     if hasattr(self, handler):
@@ -57,7 +57,7 @@ class kungfu(mods.Plugin):
         Check if and with how much power a hit is done
         """
         random.seed()
-        rnumber = random.randit(1, 100)
+        rnumber = random.randint(1, 100)
 
         if rnumber >= critical:
             return self.hit_power['critical']
@@ -72,8 +72,8 @@ class kungfu(mods.Plugin):
         for part in moves.bodyparts.iterkeys():
             if part in self.body:
                 cbodyparts = moves.bodyparts[part]
-                if list(set(cbodypart+self._location)-set(cbodypart)) != []:
-                    cbodyparts.update(moves.bodyparts[part][0])
+                if list(set(cbodyparts+self._location)-set(cbodyparts)) != []:
+                    cbodyparts = list(cbodyparts + moves.bodyparts[part])
                     modifier = 1.5
                 else:
                     modifier = 0
@@ -86,14 +86,14 @@ class kungfu(mods.Plugin):
                 elif 'BOTTOM' in cbodyparts:
                     hit = self._check_hit(90, 30*modifier, 10*modifier)
 
-        if hit in self.hit_power['powerless']:
+        if hit == self.hit_power['powerless']:
             return "Ah ah, that kick doesn't even frighten a bug !"
-        elif hit in self.hit_power['missed']:
+        elif hit == self.hit_power['missed']:
             return "Improve your AIM - Improve yourself. " \
                    "You just missed me, faggot !"
-        elif hit in self.hit_power['critical']:
+        elif hit == self.hit_power['critical']:
             return "Yeah, thanks to you. You just successfuly hit my "+part+'.'
-        elif hit in self.hit_power['normal']:
+        elif hit == self.hit_power['normal']:
             return 'Ouch, that hurt !'
 
 Class=kungfu
