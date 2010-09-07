@@ -3,7 +3,8 @@
 
 import random
 import mods
-import mods.kungfu.moves as moves
+import moves
+from irclib.irclib import nm_to_n
 
 class kungfu(mods.Plugin):
 
@@ -14,9 +15,11 @@ class kungfu(mods.Plugin):
         'missed':    0x0013
     }
 
-    def __init__(self):
+    def __init__(self, config):
+        self.settings = config
+        # this is the irc message body, not the corpse
         self.body = None
-        pass
+        self._location = ['TOP','LEFT','RIGHT', 'MIDDLE', 'BOTTOM', 'CENTRAL']
 
     def on_privmsg(self, c, e):
         self._on_msg(c, e)
@@ -32,9 +35,9 @@ class kungfu(mods.Plugin):
         if self.body == '' or self.body[0] == "<" or self.body[0:1] == " <":
             return
 
-        if self.body[0] = ':':
+        if self.body[0] == ':':
             pass # special commands
-        elif self.settings['nickname'].lower() in self.body:
+        elif self.settings['nickname'].lower() in self.body.lower():
             for move, actions in moves.attack:
                 if move in self.body:
                     handler = "process_" + move
@@ -48,20 +51,49 @@ class kungfu(mods.Plugin):
                         c.privmsg(target,
                                   "And by the way, stop hitting me. It hurts!")
 
-    def process_kick(self, actions):
+
+    def _check_hit(self, critical, fail, miss):
+        """
+        Check if and with how much power a hit is done
+        """
         random.seed()
-        rnumber = random.randint(1,100)
+        rnumber = random.randit(1, 100)
+
+        if rnumber >= critical:
+            return self.hit_power['critical']
+        elif miss < rnumber < fail:
+            return self.hit_power['powerless']
+        elif rnumber < fail:
+            return self.hit_power['missed']
+        else:
+            return self.hit_power['normal']
+
+    def process_kick(self, actions):
         for part in moves.bodyparts.iterkeys():
             if part in self.body:
-                if 'TOP' in moves.bodyparts[part]:
-                    if rnumber >= 80:
-                        hit = self.hit_power['critical']
-                    elif rnumber >= 60:
-                        hit = self.hit_power['normal']
-                    elif 20 < rnumber < 60:
-                        hit = self.hit_power['powerless']
-                    else:
-                        hit = self.hit_power['missed']
-        return ""
+                cbodyparts = moves.bodyparts[part]
+                if list(set(cbodypart+self._location)-set(cbodypart)) != []:
+                    cbodyparts.update(moves.bodyparts[part][0])
+                    modifier = 1.5
+                else:
+                    modifier = 0
+
+                # TOP meaning 'head' and hard to touch
+                if 'TOP' in cbodyparts:
+                    hit = self._check_hit(90, 40*modifier, 10*modifier)
+                elif 'CENTRAL' in cbodyparts or 'MIDDLE' in cbodypart:
+                    hit = self._check_hit(80, 30*modifier, 5*modifier)
+                elif 'BOTTOM' in cbodyparts:
+                    hit = self._check_hit(90, 30*modifier, 10*modifier)
+
+        if hit in self.hit_power['powerless']:
+            return "Ah ah, that kick doesn't even frighten a bug !"
+        elif hit in self.hit_power['missed']:
+            return "Improve your AIM - Improve yourself. " \
+                   "You just missed me, faggot !"
+        elif hit in self.hit_power['critical']:
+            return "Yeah, thanks to you. You just successfuly hit my "+part+'.'
+        elif hit in self.hit_power['normal']:
+            return 'Ouch, that hurt !'
 
 Class=kungfu

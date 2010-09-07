@@ -19,7 +19,7 @@ root directory and edit it.
 *  owners: list of know owners. Format <*List*> `['owner1','owner2','ownern']`
 *  password: master password. Format <*String*>
 
-There is modules who needs their own parameters. I'll create a wiki page for
+There are modules who needs their own parameters. I'll create a wiki page for
 them when I have time.
 
  Python irclib
