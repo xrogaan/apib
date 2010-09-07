@@ -81,10 +81,17 @@ class kungfu(mods.Plugin):
                 # TOP meaning 'head' and hard to touch
                 if 'TOP' in cbodyparts:
                     hit = self._check_hit(90, 40*modifier, 10*modifier)
-                elif 'CENTRAL' in cbodyparts or 'MIDDLE' in cbodypart:
+                elif 'CENTRAL' in cbodyparts or 'MIDDLE' in cbodyparts:
                     hit = self._check_hit(80, 30*modifier, 5*modifier)
                 elif 'BOTTOM' in cbodyparts:
                     hit = self._check_hit(90, 30*modifier, 10*modifier)
+
+        try:
+            hit
+        except:
+            self.body = self.body + " " + random.choice(moves.bodyparts.keys())
+            return self.process_kick(actions)
+
 
         if hit == self.hit_power['powerless']:
             return "Ah ah, that kick doesn't even frighten a bug !"
