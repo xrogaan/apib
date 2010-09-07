@@ -10,6 +10,7 @@ To configure the bot, you'll need to copy `contrib/config.yaml.dist` to the
 root directory and edit it.
 
 **Basic configuration:**
+
 *  servers: IRC Server to connect to. The prefix `!!python/tulpe` is required.
 *  channels: channels in the auto-join list. Format <*List*>
    `['#channel1','#channel2','#channeln']`
