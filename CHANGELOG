@@ -4,7 +4,12 @@ CHANGE SINCE 0.999999999999996d:
 MAJOR CHANGES:
  * things from irc can now be mirrored to modules
  * modules are loaded before opening sockets
+ * if the bot should can't handle a fight, it just say that he can't
+ * the bot know kungfu (in a matrix way)
+ * has a phpbb feed reader.
+
 MINOR CHANGES:
  none
+
 BUG FIXES:
- none
+ * So many ...

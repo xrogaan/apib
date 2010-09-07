@@ -14,6 +14,7 @@ class kungfu(mods.Plugin):
         'powerless': 0x0012,
         'missed':    0x0013
     }
+    logMessage = "%d.%m.%y %H:%M:%S> Module(%(name)s): %(message)s"
 
     def __init__(self, config):
         self.settings = config
@@ -58,6 +59,10 @@ class kungfu(mods.Plugin):
         """
         random.seed()
         rnumber = random.randint(1, 100)
+        print time.strftime(self.logMessage, time.gmtime()) % {
+                'name': self.name(),
+                'message': 'roll is '+rnumber
+        }
 
         if rnumber >= critical:
             return self.hit_power['critical']
