@@ -99,13 +99,12 @@ class kungfu(mods.Plugin):
 
 
         if hit == self.hit_power['powerless']:
-            return "Ah ah, that kick doesn't even frighten a bug !"
+            return actions['messages']['powerless']
         elif hit == self.hit_power['missed']:
-            return "Improve your AIM - Improve yourself. " \
-                   "You just missed me, faggot !"
+            return actions['messages']['missed']
         elif hit == self.hit_power['critical']:
-            return "Yeah, thanks to you. You just successfuly hit my "+part+'.'
+            return actions['messages']['critical']
         elif hit == self.hit_power['normal']:
-            return 'Ouch, that hurt !'
+            return actions['messages']['normal']
 
 Class=kungfu
