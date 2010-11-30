@@ -24,6 +24,10 @@ class Kungfu(mods.Plugin):
 
     def on_pubmsg(self, c, e):
         self._on_msg(c, e)
+        
+    def on_ctcp(self, c, e):
+        if self.settings['nickname'].lower() in e.arguments()[0].lower():
+            self._on_msg(c,e)
 
     def on_ping(self, connexion, event):
         random.seed()

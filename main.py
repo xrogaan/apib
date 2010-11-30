@@ -181,19 +181,9 @@ class Apib(SingleServerIRCBot):
             self.do_private_commands(command_list, source, target, c, e)
 
         # Huh, you're talking to me ?!
-        if command_list[0].find(self.settings['nickname']) != -1:
-            print "Somebody ask my by my nickname. Heh, they don't even know " \
-                   "who am I!"
-            if source in self.owners and "go" and "away" in command_list \
-                    and self.rebel is True:
-                        print "> system going down..."
-                        self.output("No, I... won't! I ...", args)
-                        sys.exit()
-
-        if command_list[0] == ':die':
-            if self.rebel is None:
-                self.output("Not today. Not ever.", args)
-                self.rebel=True
+        if source in self.owners and command_list[0] == ':die':
+            print "> system going down..."
+            sys.exit()
 
     def do_private_commands(self, command_list, source, target, c, e):
         """
@@ -334,7 +324,7 @@ if __name__ == "__main__":
                 s.append(6667)
 
     bot = Apib(config)
-    print "Connection to server ..."
+
     try:
         bot.our_start()
     except KeyboardInterrupt, e:

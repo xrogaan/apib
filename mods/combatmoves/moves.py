@@ -4,7 +4,7 @@
 getdamagemsg = (
     "Aaarh !",
     "Pfffthss !",
-    "Noooo... Arrh, get it off me !",
+    "Noooo... Arrh, get it off me !"
 )
 
 damagedmsg = (
