@@ -5,8 +5,9 @@ import random
 import mods
 import moves
 from irclib.irclib import nm_to_n
+import time
 
-class kungfu(mods.Plugin):
+class Kungfu(mods.Plugin):
 
     hit_power = {
         'critical':  0x0010,
@@ -16,8 +17,9 @@ class kungfu(mods.Plugin):
     }
     logMessage = "%d.%m.%y %H:%M:%S> Module(%(name)s): %(message)s"
 
-    def __init__(self, config):
+    def __init__(self, config, shedulefn):
         self.settings = config
+        self._shedulefn = shedulefn
         # this is the irc message body, not the corpse
         self.body = None
         self._location = ['TOP','LEFT','RIGHT', 'MIDDLE', 'BOTTOM', 'CENTRAL']
@@ -28,6 +30,22 @@ class kungfu(mods.Plugin):
     def on_pubmsg(self, c, e):
         self._on_msg(c, e)
 
+    def on_ping(self, connexion, event):
+        random.seed()
+        if self.damaged['status']:
+            if random.randint(1,100) * self._get_modifier(self.damaged['time']) > random.randint(50,150):
+                self.damaged['time'] = time.time()
+                n = random.randint(0,len(moves.damagedmsg)-1)
+                connexion.privmsg(event.target(), moves.damagedmsg[n])
+        else:
+            if random.randint(1,100) * self._get_modifier(self.idle['time']) > random.randint(80,200):
+                self.idle['time'] = time.time()
+                n = random.randint(0,len(moves.idlemsg)-1)
+                connexion.privmsg(event.target(), moves.idlemsg[n])
+
+    def _get_modifier(self, t1):
+        return abs(int(time.time() - t1) / 60 ) * 0.10
+        
     def _on_msg(self, c, e):
         source = nm_to_n(e.source())
         target = e.target()
@@ -107,4 +125,4 @@ class kungfu(mods.Plugin):
         elif hit == self.hit_power['normal']:
             return actions['messages']['normal']
 
-Class=kungfu
+Class=Kungfu

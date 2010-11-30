@@ -79,7 +79,7 @@ def shorten(longurl, login, apik, **params):
     try:
         response = opener.open(url)
         code = response.code
-        data = respones.read()
+        data = response.read()
     except urllib2.URLError, e:
         return 500, str(e)
     except urllib2.HTTPError, e:

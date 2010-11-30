@@ -36,8 +36,9 @@ def loadModule(name):
         sys.modules[module.__name__] = module
     return module
 
-def loadModuleClass(module, obj, args=()):
+def loadModuleClass(module, obj, args=(), shedulefn):
     try:
+        args = list(args) + [shedulefn]
         curMod = module.Classes[obj](*args)
     except AttributeError, e:
         if 'Class' in str(e):
@@ -62,8 +63,8 @@ class Apib(SingleServerIRCBot):
 
     commanddict = {
             "die": "Special command, makes the bot suicidal.",
-            "join": "Makes the bot walk through other channels. Like they want " \
-                    "him ...",
+            "join": "Makes the bot walk through other channels. Like they " \
+                    " want him ...",
             "part": "Takes back the bot from others channels.",
             "nick": "Funny part, he could want to be Napoleon...",
             "quitmsg": "Set the quit message. Without arguments show the " \
@@ -98,7 +99,8 @@ class Apib(SingleServerIRCBot):
             self.modules.update({
                 mod['subname']: loadModuleClass(loadModule(mod['name']),
                                                 mod['subname'],
-                                                mod['args'])
+                                                mod['args'],
+                                                self.ircobj.execute_scheduled)
             })
             if self.modules[mod['subname']].config('handle') == 'scheduled':
                 self.ircobj.execute_scheduled(

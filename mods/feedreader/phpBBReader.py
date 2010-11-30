@@ -13,9 +13,10 @@ class phpBBReader(mods.Plugin):
     lastId = None
     logMessage = "%d.%m.%y %H:%M:%S> Module(%(name)s): %(message)s"
 
-    def __init__(self, url, delay=300, args={}):
+    def __init__(self, url, delay=300, args={}, shedulefn):
         self.url = url
         self.delay = delay
+        self._shedulefn = shedulefn
         self.forums_ignore = []
         if type(args) is DictType:
             if args.has_key('channel'):
