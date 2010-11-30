@@ -36,9 +36,10 @@ def loadModule(name):
         sys.modules[module.__name__] = module
     return module
 
-def loadModuleClass(module, obj, args=(), shedulefn):
+def loadModuleClass(module, obj, shedulefn, args=()):
     try:
-        args = list(args) + [shedulefn]
+        args = list(args)
+        args.insert(0, shedulefn)
         curMod = module.Classes[obj](*args)
     except AttributeError, e:
         if 'Class' in str(e):
@@ -78,7 +79,6 @@ class Apib(SingleServerIRCBot):
         self.chans    = config['channels']
         self.owners   = config['owners']
         self.rebel    = None
-        self.t_counter= 0
         self.modules  = {}
 
     def _modules_dispatcher(self, c, e):
@@ -99,8 +99,8 @@ class Apib(SingleServerIRCBot):
             self.modules.update({
                 mod['subname']: loadModuleClass(loadModule(mod['name']),
                                                 mod['subname'],
-                                                mod['args'],
-                                                self.ircobj.execute_scheduled)
+                                                self.ircobj.execute_scheduled,
+                                                mod['args'])
             })
             if self.modules[mod['subname']].config('handle') == 'scheduled':
                 self.ircobj.execute_scheduled(
@@ -175,7 +175,6 @@ class Apib(SingleServerIRCBot):
         """
         General irc commands
         """
-        msg = ""
         args = ("<none>", source, target, c, e)
 
         if e.eventtype() == "privmsg":
@@ -190,25 +189,6 @@ class Apib(SingleServerIRCBot):
                         print "> system going down..."
                         self.output("No, I... won't! I ...", args)
                         sys.exit()
-            else:
-                print "> Regular answer."
-                print "> Counter is on %s" % self.t_counter
-                msg = "You're talking to me"
-                if self.t_counter == 0:
-                    msg = msg + "?"
-                elif self.t_counter == 1:
-                    msg = msg + "?!"
-                elif self.t_counter == 2:
-                    msg = msg + "!"
-                elif self.t_counter == 3:
-                    msg = "Who to fuck do you thing you're talking to ?"
-                elif self.t_counter == 4:
-                    msg = "Oh yeah ? Okay ..."
-                    self.t_counter = -1
-                    print "> Counter reinitialized"
-
-                self.output(msg, args)
-                self.t_counter = self.t_counter+1
 
         if command_list[0] == ':die':
             if self.rebel is None:

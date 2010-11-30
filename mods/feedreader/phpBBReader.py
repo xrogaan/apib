@@ -2,18 +2,24 @@
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
 from types import *
-import feedparser
 import mods
 import time
 import io
 import re
+
+try:
+    import feedparser
+except ImportError:
+    print('Error: feedparser not found. Please install it.')
+    print('Feedparser website: http://feedparser.org/')
+    exit(1)
 
 class phpBBReader(mods.Plugin):
 
     lastId = None
     logMessage = "%d.%m.%y %H:%M:%S> Module(%(name)s): %(message)s"
 
-    def __init__(self, url, delay=300, args={}, shedulefn):
+    def __init__(self, shedulefn, url, delay=300, args={}):
         self.url = url
         self.delay = delay
         self._shedulefn = shedulefn

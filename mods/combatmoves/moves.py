@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
+getdamagemsg = (
+    "Aaarh !",
+    "Pfffthss !",
+    "Noooo... Arrh, get it off me !",
+)
+
 damagedmsg = (
     "Oh my God, I'm leaking! I think I'm leaking! Ahhhh, I'm leaking! There's "\
         "oil everywhere!",
