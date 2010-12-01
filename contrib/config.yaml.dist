@@ -1,11 +1,15 @@
-servers: 
+servers:
  - !!python/tuple [irc.freenode.net, 6667]
 channels: ['#php-fr']
-nickname: apib
+nickname: &nickname
+  "apib"
 quitmsg: "Does not compute"
 owners: ['xrogaan']
 password: My secret password that no ones know.
 
+bitly: &BITLY
+  login: mylogin
+  apikey: 'R_apikey'
 
 #
 # The argument 'args' only require 3 minus.
@@ -26,8 +30,16 @@ modules:
   - 300                          # time between parses
   - channel: '#naev'             # the channel to send notifications
     ignore: []                   # a list of forum id to ignore sample: [1,2,3]
-
-bitly:
-  login: mylogin
-  apikey: 'R_apikey'
+    handle: scheduled            # This do not need to be changed
+    bitly: *BITLY                # This is only to be set if you want to use
+                                 # bitly. Remove that line or comment it if you 
+                                 # do not want to use bitly services.
+# Here only matters the channel name and the nickname (who is the nickname of
+# the bot).
+- name: combatmoves
+  subname: kungfu
+  args: !!python/tuple
+  - handle: to_dispatch
+    nickname: *nickname
+    channel: '#naev'                            
 
