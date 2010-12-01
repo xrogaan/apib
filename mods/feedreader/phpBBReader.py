@@ -180,7 +180,14 @@ class phpBBReader(mods.Plugin):
         if self._use_bitly:
             import simplejson
             result = simplejson.loads(self.shorten(longurl))
-            return result['data']['url']
+            if result['status_code'] is not 200:
+                print time.strftime(self.logMessage, time.gmtime()) % {
+                    'message': "bitly error: %s" % result['status_txt'],
+                    'name': self.name()
+                }
+                return longurl
+            else:
+                return result['data']['url']
         else:
             return longurl
 
