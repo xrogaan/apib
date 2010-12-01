@@ -175,8 +175,6 @@ class Apib(SingleServerIRCBot):
         """
         General irc commands
         """
-        args = ("<none>", source, target, c, e)
-
         if e.eventtype() == "privmsg":
             self.do_private_commands(command_list, source, target, c, e)
 

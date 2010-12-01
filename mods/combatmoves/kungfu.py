@@ -29,7 +29,7 @@ class Kungfu(mods.Plugin):
         if self.settings['nickname'].lower() in e.arguments()[0].lower():
             self._on_msg(c,e)
 
-    def on_ping(self, connexion, event):
+    def on_ping(self, c, event):
         random.seed()
         if self.damaged['status']:
             if random.randint(1,100) * self._get_modifier(self.damaged['time']) > random.randint(50,150):
@@ -39,7 +39,7 @@ class Kungfu(mods.Plugin):
                 }
                 self.damaged['time'] = time.time()
                 n = random.randint(0,len(moves.damagedmsg)-1)
-                connexion.privmsg(event.target(), moves.damagedmsg[n])
+                c.privmsg(self.settings['channel'], moves.damagedmsg[n])
             else:
                 print time.strftime(self.logMessage, time.gmtime()) % {
                     'message': "Still damaged, but no message",
@@ -53,7 +53,7 @@ class Kungfu(mods.Plugin):
                 }
                 self.idle['time'] = time.time()
                 n = random.randint(0,len(moves.idlemsg)-1)
-                connexion.privmsg(event.target(), moves.idlemsg[n])
+                c.privmsg(self.settings['channel'], moves.idlemsg[n])
 
     def _get_modifier(self, t1):
         return abs(int(time.time() - t1) / 60 ) * 0.10
@@ -70,7 +70,7 @@ class Kungfu(mods.Plugin):
             pass # special commands
         elif self.settings['nickname'].lower() in self.body.lower():
             random.seed()
-            if "repair" in self.body:
+            if "repair" in self.body and self.damaged['status']:
                 self.damaged.update({'status': False, 'time': time.time()})
                 c.privmsg(target, "Good as new, I think. Am I leaking?")
                 return
