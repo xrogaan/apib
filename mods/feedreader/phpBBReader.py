@@ -6,6 +6,7 @@ import mods
 import time
 import io
 import re
+import urllib2
 
 try:
     import feedparser
@@ -13,6 +14,12 @@ except ImportError:
     print('Error: feedparser not found. Please install it.')
     print('Feedparser website: http://feedparser.org/')
     exit(1)
+
+class DontRedirect(urllib2.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        if code in (301, 302, 303, 307):
+            raise urllib2.HTTPError(req.get_full_url(),
+                    code, msg, headers, fp)
 
 class phpBBReader(mods.Plugin):
 
@@ -37,6 +44,12 @@ class phpBBReader(mods.Plugin):
                     del args['ignore']
                 else:
                     self.forums_ignore.append(args.pop('ignore'))
+
+            if args.has_key('bitly'):
+                self._use_bitly = True
+                self._bitly_settings = args['bitly']
+            else:
+                self._use_bitly = False
 
             self.settings = args
         else:
@@ -158,11 +171,51 @@ class phpBBReader(mods.Plugin):
         for p in messages:
             msg.append(pattern % (p['author'],
                                   mods.unescape(p['title']),
-                                  p['link']))
+                                  self._get_bitly_url(p['link'])
+                                 )
+                      )
         return msg
 
-    def _get_bitly_url(self, url):
-        bitly_url = "http://api.bit.ly/v3/shorten?login="
+    def _get_bitly_url(self, longurl):
+        if self._use_bitly:
+            import simplejson
+            result = simplejson.loads(self.shorten(longurl))
+            return result['data']['url']
+        else:
+            return longurl
 
+    def shorten(self, longurl):
+        """
+        bitly shorten function.
+        Based on http://github.com/bitly/bitly-api-python
+        """
+        import urllib
+
+        v = sys.version_info
+        user_agent = "python/v%d.%d.%d" % v[0], v[1], v[2]
+
+        bitly_url = 'http://api.bit.ly/v3/shorten'
+        params.update({
+            'login': self._bitly_settings['login'],
+            'apiKey': self._bitly_settings['apiKey'],
+            'uri': longurl,
+            'format': params.get('format', 'json')
+        })
+        url = bitly_url + "?%" % urllib.urlencode(params, doseq=1)
+
+        dont_redirect = DontRedirect()
+        opener = urllib2.build_opener(dont_redirect)
+        opener.addheaders = [('User-agent', user_agent + ' urllib')]
+
+        try:
+            response = opener.open(url)
+            code = response.code
+            data = response.read()
+        except urllib2.URLError, e:
+            return 500, str(e)
+        except urllib2.HTTPError, e:
+            code = e.code
+            data = e.read()
+        return {'http_status_code': code, 'result': data}
 
 Class = phpBBReader
