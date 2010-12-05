@@ -24,10 +24,15 @@ class Kungfu(mods.Plugin):
 
     def on_pubmsg(self, c, e):
         self._on_msg(c, e)
-        
+
     def on_ctcp(self, c, e):
-        if self.settings['nickname'].lower() in e.arguments()[0].lower():
-            self._on_msg(c,e)
+        ctcptype = e.arguments()[0]
+        if ctcptype == "ACTION":
+            self._on_msg(c, e)
+        else:
+            # Just ignore it
+            #SingleServerIRCBot.on_ctcp(self, c, e)
+            pass
 
     def on_ping(self, c, event):
         random.seed()
@@ -57,7 +62,7 @@ class Kungfu(mods.Plugin):
 
     def _get_modifier(self, t1):
         return abs(int(time.time() - t1) / 60 ) * 0.10
-        
+
     def _on_msg(self, c, e):
         source = nm_to_n(e.source())
         target = e.target()
@@ -74,7 +79,7 @@ class Kungfu(mods.Plugin):
                 self.damaged.update({'status': False, 'time': time.time()})
                 c.privmsg(target, "Good as new, I think. Am I leaking?")
                 return
-                
+
             for move in list(moves.attacks):
                 if move in self.body:
                     n = random.randint(0,len(moves.getdamagemsg)-1)
