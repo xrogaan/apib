@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
-import re, htmlentitydefs
+import re
+import htmlentitydefs
+
 
 class PluginError(Exception):
     """Represent a Plugin Exception"""

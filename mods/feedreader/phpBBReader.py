@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
-from types import *
-import mods
 import time
 import io
 import re
@@ -15,11 +13,15 @@ except ImportError:
     print('Feedparser website: http://feedparser.org/')
     exit(1)
 
+import mods
+
+
 class DontRedirect(urllib2.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         if code in (301, 302, 303, 307):
             raise urllib2.HTTPError(req.get_full_url(),
                     code, msg, headers, fp)
+
 
 class phpBBReader(mods.Plugin):
 
@@ -31,14 +33,15 @@ class phpBBReader(mods.Plugin):
         self.delay = delay
         self._shedulefn = shedulefn
         self.forums_ignore = []
-        if type(args) is DictType:
+        if isinstance(args, dict):
             if args.has_key('channel'):
                 self.channel = args.pop('channel')
             else:
-                raise mods.PluginError, "Module error: required argument `channel` is missing."
+                raise mods.PluginError,
+                      "Module error: required argument `channel` is missing."
 
             if args.has_key('ignore'):
-                if type(args['ignore']) is ListType:
+                if isinstance(args['ignore'], list):
                     for v in args['ignore']:
                         self.forums_ignore.append(v)
                     del args['ignore']

@@ -2,10 +2,10 @@
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
 import random
+import time
 import mods
 import moves
 from irclib.irclib import nm_to_n
-import time
 
 class Kungfu(mods.Plugin):
 

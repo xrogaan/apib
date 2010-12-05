@@ -2,10 +2,20 @@
 # -*- coding: utf-8 -*-
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
-import os, sys
+__version__="0.2.0"
+
+import os
+import sys
 import imp
 import traceback
 import time
+
+try:
+    import yaml
+except ImportError:
+    print "Error: PyYAML is missing. - http://pyyaml.org/wiki/PyYAML"
+    sys.exit(1)
+
 try:
     from irclib.irclib import *
     from irclib.ircbot import *
@@ -15,14 +25,6 @@ except ImportError:
     print "http://python-irclib.sourceforge.net/"
     sys.exit(1)
 
-try:
-    import yaml
-except ImportError:
-    print "Error: PyYAML is missing. - http://pyyaml.org/wiki/PyYAML"
-    sys.exit(1)
-
-
-__version__="0.999999999999996d"
 
 def loadModule(name):
     dir = ["./mods"]
@@ -168,7 +170,8 @@ class Apib(SingleServerIRCBot):
         commands = body.split()
         commands[0] = commands[0].lower()
 
-        if body[0] == ':' or body.find(self.settings['nickname'].lower()) != -1:
+        if (body[0] == ':' or
+            body.find(self.settings['nickname'].lower()) != -1):
             self.do_commands(commands, source, target, c, e)
 
     def do_commands(self, command_list, source, target, c, e):
@@ -188,14 +191,15 @@ class Apib(SingleServerIRCBot):
         Special irc commands
         """
         # set owner credentials
-        if command_list[0] == ':owner' and len(command_list) > 1 and source not in self.owners:
+        if (command_list[0] == ':owner' and len(command_list) > 1 and
+            source not in self.owners):
             if command_list[1] == self.settings['password']:
                 self.owners.append(source)
                 self.output("Lucky you! Now I want to eat something.",
-                        ("", source, target, c, e))
+                           ("", source, target, c, e))
             else:
                 self.output("No, you can't have my cookie. IT'S MINE!!!",
-                        ("", source, target, c, e))
+                           ("", source, target, c, e))
 
         # change nickname
         elif command_list[0] == ':nick':
@@ -249,15 +253,17 @@ class Apib(SingleServerIRCBot):
             action = 0
 
         # Joins replies and public messages
-        if e.eventtype() == "join" or e.eventtype() == "quit" or \
-           e.eventtype() == "part" or e.eventtype() == "pubmsg":
+        if (e.eventtype() == "join" or e.eventtype() == "quit" or
+            e.eventtype() == "part" or e.eventtype() == "pubmsg"):
             if action == 0:
-                print "[%s] <%s> > %s> %s" % ( get_time(), self.settings['nickname'],
-                        target, message)
+                print "[%s] <%s> > %s> %s" % (get_time(),
+                                              self.settings['nickname'],
+                                              target, message)
                 c.privmsg(target, message)
             else:
-                print "[%s] <%s> > %s> /me %s" % ( get_time(), self.settings['nickname'],
-                        target, message)
+                print "[%s] <%s> > %s> /me %s" % (get_time(),
+                                                  self.settings['nickname'],
+                                                  target, message)
                 c.action(target, message)
         # Private messages
         elif e.eventtype() == "privmsg":
@@ -268,36 +274,39 @@ class Apib(SingleServerIRCBot):
                 c.privmsg(source, message)
                 # send copy to owner
                 if not source in self.owners:
-                    c.privmsg(','.join(self.owners), "(From "+source+") "+body)
-                    c.privmsg(','.join(self.owners), "(To   "+source+") "+message)
+                    c.privmsg(','.join(self.owners),
+                              "(From "+source+") "+body)
+                    c.privmsg(','.join(self.owners),
+                              "(To   "+source+") "+message)
             # ctcp action priv msg
             else:
-                print "[%s] <%s> > %s> /me %s" % ( get_time(),
-                        self.settings['nickname'], target, message)
+                print "[%s] <%s> > %s> /me %s" % (get_time(),
+                                                  self.settings['nickname'],
+                                                  target, message)
                 c.action(source, message)
                 # send copy to owner
                 if not source in self.owners:
-                    map ( ( lambda x: c.action(x, "(From "+source+") "+body) ), self.owners)
-                    map ( ( lambda x: c.action(x, "(To   "+source+") "+message) ), self.owners)
+                    map ((lambda x: c.action(x, "(From "+source+") "+body)), self.owners)
+                    map ((lambda x: c.action(x, "(To   "+source+") "+message)), self.owners)
 
 if __name__ == "__main__":
     from optparse import OptionParser
 
-    usage="Usage: %prog [-s <server> [-p <port>]] [-c <channel>] config.yaml"
+    usage = "Usage: %prog [-s <server> [-p <port>]] [-c <channel>] config.yaml"
     parser = OptionParser(usage=usage, version="%prog "+__version__,
-            description="A schizophrenic irc bot.")
+                          description="A schizophrenic irc bot.")
 
     parser.add_option("-s", "--server",
-                    metavar="SERVERAME", help="Server adress to connect to")
+                      metavar="SERVERAME", help="Server adress to connect to")
 
     parser.add_option("-p", "--port",
-                    metavar="PORT", help="Port number to connect to")
+                      metavar="PORT", help="Port number to connect to")
 
     parser.add_option("-c", "--channel",
-                    metavar="CHANNEL", help="Join CHANNEL on connect")
+                      metavar="CHANNEL", help="Join CHANNEL on connect")
 
     (cfg, arguments) = parser.parse_args()
-    if len(arguments)!=1:
+    if len(arguments) != 1:
         parser.error("incorrect number of arguments")
 
     configFile = os.path.abspath(os.path.normpath(arguments[0]))
@@ -310,8 +319,8 @@ if __name__ == "__main__":
     config.setdefault('nickname', 'apib')
 
     if cfg.server is not None:
-        config['servers'].append( (cfg.server,
-            cfg.port if cfg.port is not None else 6667) )
+        config['servers'].append((cfg.server,
+                                  cfg.port if cfg.port is not None else 6667))
     if cfg.channel is not None:
         config['channels'].append(cfg.channel)
 
