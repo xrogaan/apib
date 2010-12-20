@@ -9,7 +9,7 @@ password: My secret password that no ones know.
 
 bitly: &BITLY
   login: mylogin
-  apikey: 'R_apikey'
+  apiKey: 'R_apikey'
 
 #
 # The argument 'args' only require 3 minus.
