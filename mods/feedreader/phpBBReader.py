@@ -183,15 +183,19 @@ class phpBBReader(mods.Plugin):
     def _get_bitly_url(self, longurl):
         if self._use_bitly:
             import simplejson
-            result = simplejson.loads(self.shorten(longurl))
+            rawjson = self.shorten(longurl)
+            result = simplejson.loads(rawjson['result'])
+
             if result['status_code'] is not 200:
                 print time.strftime(self.logMessage, time.gmtime()) % {
                     'message': "bitly error: %s" % result['status_txt'],
                     'name': self.name()
                 }
                 return longurl
+
             else:
                 return result['data']['url']
+
         else:
             return longurl
 
@@ -216,7 +220,7 @@ class phpBBReader(mods.Plugin):
             'uri': longurl,
             'format': 'json'
         })
-        url = bitly_url + "?%" % urllib.urlencode(params, doseq=1)
+        url = bitly_url + "?%s" % urllib.urlencode(params, doseq=1)
 
         dont_redirect = DontRedirect()
         opener = urllib2.build_opener(dont_redirect)
@@ -227,7 +231,8 @@ class phpBBReader(mods.Plugin):
             code = response.code
             data = response.read()
         except urllib2.URLError, e:
-            return 500, str(e)
+            code = 500
+            data = str(e)
         except urllib2.HTTPError, e:
             code = e.code
             data = e.read()
