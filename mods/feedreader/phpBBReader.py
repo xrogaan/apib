@@ -38,8 +38,8 @@ class phpBBReader(mods.Plugin):
             if args.has_key('channel'):
                 self.channel = args.pop('channel')
             else:
-                raise mods.PluginError,
-                      "Module error: required argument `channel` is missing."
+                raise mods.PluginError("Module error: required argument "\
+                                       "`channel` is missing.")
 
             if args.has_key('ignore'):
                 if isinstance(args['ignore'], list):
@@ -214,7 +214,7 @@ class phpBBReader(mods.Plugin):
             'login': self._bitly_settings['login'],
             'apiKey': self._bitly_settings['apiKey'],
             'uri': longurl,
-            'format': params.get('format', 'json')
+            'format': 'json'
         })
         url = bitly_url + "?%" % urllib.urlencode(params, doseq=1)
 
