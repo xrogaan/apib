@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
+import sys
 import time
 import io
 import re
@@ -202,10 +203,14 @@ class phpBBReader(mods.Plugin):
         import urllib
 
         v = sys.version_info
-        user_agent = "python/v%d.%d.%d" % v[0], v[1], v[2]
+        try:
+            user_agent = "python/v%d.%d.%d" % (v[0], v[1], v[2])
+        except TypeError, e:
+            user_agent = "python/v%d.%d.%d" % (v['major'], v['minor'],
+                                               v['micro'])
 
         bitly_url = 'http://api.bit.ly/v3/shorten'
-        params.update({
+        params = dict({
             'login': self._bitly_settings['login'],
             'apiKey': self._bitly_settings['apiKey'],
             'uri': longurl,
