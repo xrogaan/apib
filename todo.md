@@ -22,5 +22,6 @@ simple load the file into memory. Aliases are easy to do with PyYaml.
 
 ## MINOR:
 
+* (kungfu) doesn't process ctcp ACTION. That's weird.
 * (auto) transform long urls into bitly tiny urls
 
