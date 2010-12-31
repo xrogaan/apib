@@ -99,11 +99,13 @@ class Apib(SingleServerIRCBot):
         for mod in self.settings['modules']:
             print ">>> %s ..." % (mod['subname'])
             self.modules.update({
-                mod['subname']: loadModuleClass(loadModule(mod['name']),
-                                                mod['subname'],
-                                                self.ircobj.execute_scheduled,
-                                                mod['args'])
-            })
+                mod['subname']: loadModuleClass(
+                                    loadModule(mod['name']),
+                                    mod['subname'],
+                                    self.ircobj.owners,
+                                    mod['args'])
+                })
+
             if self.modules[mod['subname']].config('handle') == 'scheduled':
                 self.ircobj.execute_scheduled(
                         mod['args'][1], # delay
@@ -201,27 +203,28 @@ class Apib(SingleServerIRCBot):
                 self.output("No, you can't have my cookie. IT'S MINE!!!",
                            ("", source, target, c, e))
 
-        # change nickname
-        elif command_list[0] == ':nick':
-            try:
-                self.connection.nick(command_list[1])
-                self.settings['nickname'] = command_list[1]
-            except:
-                pass
+        elif source in self.owners:
+            # change nickname
+            if command_list[0] == ':nick':
+                try:
+                    self.connection.nick(command_list[1])
+                    self.settings['nickname'] = command_list[1]
+                except:
+                    pass
 
-        # join other channels
-        elif command_list[0] == ':join':
-            for i in range(1, len(command_list)):
-                if not command_list[i] in self.chans:
-                    self.chans.append(command_list[i])
-                    c.join(command_list[i])
+            # join other channels
+            elif command_list[0] == ':join':
+                for i in range(1, len(command_list)):
+                    if not command_list[i] in self.chans:
+                        self.chans.append(command_list[i])
+                        c.join(command_list[i])
 
-        # part from other channels
-        elif command_list[0] == ':part':
-            for i in range(1, len(command_list)):
-                if command_list[i] in self.chans:
-                    self.chans.remove(command_list[i])
-                    c.part(command_list[i])
+            # part from other channels
+            elif command_list[0] == ':part':
+                for i in range(1, len(command_list)):
+                    if command_list[i] in self.chans:
+                        self.chans.remove(command_list[i])
+                        c.part(command_list[i])
 
     def get_version(self):
         return "apib v%s, the schizophrenic ircbot" % __version__
