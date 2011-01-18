@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=80:
 
-__version__="0.2.0"
+__version__="0.2.1-dev"
 
 import os
 import sys

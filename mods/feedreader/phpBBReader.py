@@ -107,17 +107,27 @@ class phpBBReader(mods.Plugin):
         return self._getMsgs()
 
     def _getMsgs(self):
+        timeFormat = '%Y-%m-%dT%H:%M:%S'
         firstId = None
+        lastTimeId = None
         entries = []
+
+        if lastTimeId is None:
+            flen = len(self.parser['entries']) - 1
+            lastTimeId= time.strptime(self.parser['entries'][flen].updated[:-6],
+                                        timeFormat)
 
         for entry in self.parser['entries']:
             # We do not want to loop on a already sent data
             if self.lastId == entry.id:
                 break
+            elif lastTimeId > time.strptime(entry.updated[:-6],timeFormat):
+                break
 
             # Attempt to ignore designed forums
             if len(self.forums_ignore) is not 0:
                 breakit = False
+                tmpTime = time.strptime(entry.updated[:-6], timeFormat)
                 try:
                     url = entry.tags[0]['scheme']
                     fid = re.search('f=([0-9]+)$',url)
@@ -136,11 +146,18 @@ class phpBBReader(mods.Plugin):
                             'message': "post ignored: %d" % fid
                     }
                     continue
+                
+                # Always update the time to the latest know id
+                if lastTimeId < tmpTime:
+                    lastTimeId = tmpTime
+               
+                del(tmpTime)
 
             # If we don't have any id in memory, that's because there is no
             # history
             if firstId == None:
                 firstId = entry.id
+
 
             verbose = "Module(%(name)s): New message -> %(url)s" % {
                                         'name': self.name(),
