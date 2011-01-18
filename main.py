@@ -102,7 +102,7 @@ class Apib(SingleServerIRCBot):
                 mod['subname']: loadModuleClass(
                                     loadModule(mod['name']),
                                     mod['subname'],
-                                    self.ircobj.owners,
+                                    self.owners,
                                     mod['args'])
                 })
 
