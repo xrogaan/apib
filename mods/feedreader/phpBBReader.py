@@ -123,7 +123,7 @@ class phpBBReader(mods.Plugin):
             # We do not want to loop on a already sent data
             if self.lastId == entry.id:
                 break
-            if self.lastTimeId > tmpTime:
+            if self.lastTimeId >= tmpTime:
                 break
 
             # Attempt to ignore designed forums
