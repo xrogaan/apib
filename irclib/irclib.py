@@ -508,8 +508,10 @@ class ServerConnection(Connection):
 
         try:
             if self.ssl:
+                self.ssl.setblocking(0)
                 new_data = self.ssl.read(2**14)
             else:
+                self.socket.setblocking(0)
                 new_data = self.socket.recv(2**14)
         except socket.error, x:
             # The server hung up.
