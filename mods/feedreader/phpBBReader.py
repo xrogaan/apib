@@ -201,8 +201,17 @@ class phpBBReader(mods.Plugin):
     def _get_bitly_url(self, longurl):
         if self._use_bitly:
             import simplejson
-            rawjson = self.shorten(longurl)
-            result = simplejson.loads(rawjson['result'])
+            try:
+                rawjson = self.shorten(longurl)
+                result = simplejson.loads(rawjson['result'])
+            except JSONDecodeError as (errno, strerror):
+                print time.strftime(self.logMessage, time.gmtime()) % {
+                    'message': "bitly didn't return a json string. Using " \
+                            "full url instead.\n" \
+                            "JSON error({0}): {1}".format(errno, strerror),
+                    'name': self.name()
+                }
+                return longurl
 
             if result['status_code'] is not 200:
                 print time.strftime(self.logMessage, time.gmtime()) % {
