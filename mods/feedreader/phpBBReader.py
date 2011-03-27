@@ -204,11 +204,11 @@ class phpBBReader(mods.Plugin):
             try:
                 rawjson = self.shorten(longurl)
                 result = simplejson.loads(rawjson['result'])
-            except JSONDecodeError as (errno, strerror):
+            except JSONDecodeError as strerror:
                 print time.strftime(self.logMessage, time.gmtime()) % {
                     'message': "bitly didn't return a json string. Using " \
                             "full url instead.\n" \
-                            "JSON error({0}): {1}".format(errno, strerror),
+                            "JSON error: {0}".format(strerror),
                     'name': self.name()
                 }
                 return longurl
