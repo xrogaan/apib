@@ -109,6 +109,7 @@ class phpBBReader(mods.Plugin):
 
     def _getMsgs(self):
         timeFormat = '%Y-%m-%dT%H:%M:%S'
+        topicrawstr = r"""t=([0-9]*)"""
         firstId = None
         entries = []
 
@@ -144,7 +145,7 @@ class phpBBReader(mods.Plugin):
                 if breakit:
                     print time.strftime(self.logMessage, time.gmtime()) % {
                             'name':self.name(),
-                            'message': "post ignored: %d" % fid
+                            'message': "post ignored for forum id %d" % fid
                     }
                     continue
 
@@ -162,7 +163,8 @@ class phpBBReader(mods.Plugin):
             entries.append({
                     'author':   entry.author,
                     'link':     entry.link,
-                    'title':    entry.title
+                    'title':    entry.title,
+                    'threadId': re.search(topicrawstr, entry.link).group(1)
                    })
 
         tmpTime = time.strptime(self.parser['entries'][0].updated[:-6], timeFormat)
@@ -189,13 +191,35 @@ class phpBBReader(mods.Plugin):
         if len(messages)==0:
             return msg
 
-        pattern = "[off][Forum] %s posted in %s - %s"
+        pattern = "[off][Forum] %(author)s posted in %(title)s - %(link)s"
+        multPattern = "[off][Forum] %(npost)d new posts in %(title)s - " \
+                      "%(link)s"
+
+        # building some stats
+        threads = {}
+        for message in messages:
+            if threads.has_key(message['threadId']) is False:
+                threads[message['threadId']] = 1
+            else:
+                threads[message['threadId']]+= 1
+            topicLinkKey = message['threadId']
+            threads.update({message['threadId'] + '_l': message['link']})
+
+        rawstr = r"""(?u)\s•\s(.*)"""
         for p in messages:
-            msg.append(pattern % (p['author'],
-                                  mods.unescape(p['title']),
-                                  self._get_bitly_url(p['link'])
-                                 )
-                      )
+            if threads[p['threadId']] is None:
+                continue
+
+            if threads[p['threadId']] > 1:
+                title = re.search(rawstr, p.title.encode('utf-8')).group(1)
+                msg.append(multPattern % {'npost': threads[p['threadId']],
+                                          'title': title,
+                                          'link': threads[p['threadId']+'_l']})
+                threads.update({p['threadId']: None})
+            else:
+                msg.append(pattern % {'author': p['author'],
+                                      'title': mods.unescape(p['title']),
+                                      'link': self._get_bitly_url(p['link'])})
         return msg
 
     def _get_bitly_url(self, longurl):
