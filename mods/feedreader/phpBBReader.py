@@ -205,15 +205,15 @@ class phpBBReader(mods.Plugin):
             topicLinkKey = message['threadId']
             threads.update({message['threadId'] + '_l': message['link']})
 
-        rawstr = r"""(?u)\s•\s(.*)"""
+        rawstr = u'(?x)\s•\s(.*?)$'
         for p in messages:
             if threads[p['threadId']] is None:
                 continue
 
             if threads[p['threadId']] > 1:
-                title = re.search(rawstr, p.title.encode('utf-8')).group(1)
+                title = re.search(rawstr, p['title'])
                 msg.append(multPattern % {'npost': threads[p['threadId']],
-                                          'title': title,
+                                          'title': title.group(1),
                                           'link': threads[p['threadId']+'_l']})
                 threads.update({p['threadId']: None})
             else:
