@@ -103,7 +103,7 @@ class phpBBReader(mods.Plugin):
         if self.parser.bozo != 0:
             urlError = self.parser.bozo_exception
             self.vprint("Warning: bozo error in effect!!!")
-            self.vprint(">>> (%s) %s" % (urlError.reason[0],urlError.reason[1]))
+            self.vprint(">>> %s" % (urlError.getMessage()))
             return 1
 
         if self.parser.status == 404:
