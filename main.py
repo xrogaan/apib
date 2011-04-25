@@ -9,6 +9,7 @@ import sys
 import imp
 import traceback
 import time
+from types import *
 
 try:
     import yaml
@@ -24,7 +25,6 @@ except ImportError:
     print "Please, install them."
     print "http://python-irclib.sourceforge.net/"
     sys.exit(1)
-
 
 def loadModule(name):
     dir = ["./mods"]
@@ -97,14 +97,20 @@ class Apib(SingleServerIRCBot):
 
         print "Loading extra modules..."
         for mod in self.settings['modules']:
-            print ">>> %s ..." % (mod['subname'])
+            print '>'*3,' %s ...' % (mod['subname'])
+            args = list(mod['args'])
+            args.append({'verbose': self.settings['verbose']})
+            mod['args'] = args
             self.modules.update({
-                mod['subname']: loadModuleClass(
-                                    loadModule(mod['name']),
-                                    mod['subname'],
-                                    self.owners,
-                                    mod['args'])
-                })
+                mod['subname']:
+                  loadModuleClass(
+                      loadModule(mod['name']),
+                      mod['subname'],
+                      self.owners,
+                      mod['args']
+                  )
+            })
+            del(args)
 
             if self.modules[mod['subname']].config('handle') == 'scheduled':
                 self.ircobj.execute_scheduled(
@@ -114,8 +120,9 @@ class Apib(SingleServerIRCBot):
                             self.modules[mod['subname']].get_scheduled_output,
                             self.modules[mod['subname']].get_target(),
                             self.connection
-                        ))
-                print ">>> %s is scheduled" % (mod['subname'])
+                        )
+                )
+                print '>'*3,' %s is scheduled' % (mod['subname'])
 
         self.start()
 
@@ -308,6 +315,9 @@ if __name__ == "__main__":
     parser.add_option("-c", "--channel",
                       metavar="CHANNEL", help="Join CHANNEL on connect")
 
+    parser.add_option('-v', '--verbose', action="store_true", default=False,
+                     metavar="VERBOSE", help="To be more speaky")
+
     (cfg, arguments) = parser.parse_args()
     if len(arguments) != 1:
         parser.error("incorrect number of arguments")
@@ -320,6 +330,7 @@ if __name__ == "__main__":
     config.setdefault('channels', [])
     config.setdefault('owners', [])
     config.setdefault('nickname', 'apib')
+    config.setdefault('verbose', cfg.verbose)
 
     if cfg.server is not None:
         config['servers'].append((cfg.server,

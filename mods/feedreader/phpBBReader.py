@@ -29,7 +29,12 @@ class phpBBReader(mods.Plugin):
     lastId = None
     logMessage = "%d.%m.%y %H:%M:%S> Module(%(name)s): %(message)s"
 
-    def __init__(self, shedulefn, url, delay=300, args={}):
+    def __init__(self, shedulefn, url, delay=300, args={}, verbosity=False):
+        if verbosity:
+            verbosity = 5
+        else:
+            verbosity = 0
+        mods.Plugin.__init__(self,verbosity)
         self.url = url
         self.delay = delay
         self._shedulefn = shedulefn
@@ -70,9 +75,9 @@ class phpBBReader(mods.Plugin):
             else:
                 raise
 
-        print time.strftime(self.logMessage, time.gmtime()) % {
-                'message': "lastId set to %s" % c, 'name': self.name()
-        }
+        self.verbose(1,time.strftime(self.logMessage, time.gmtime()) % {
+            'message': "lastId set to %s" % c, 'name': self.name()
+            })
 
         self.lastId=c
         self.lastTimeId=None
@@ -97,8 +102,8 @@ class phpBBReader(mods.Plugin):
 
         if self.parser.bozo != 0:
             urlError = self.parser.bozo_exception
-            print "Warning: bozo error in effect!!!"
-            print ">>> (%s) %s" % (urlError.reason[0],urlError.reason[1])
+            self.vprint("Warning: bozo error in effect!!!")
+            self.vprint(">>> (%s) %s" % (urlError.reason[0],urlError.reason[1]))
             return 1
 
         if self.parser.status == 404:
@@ -117,7 +122,7 @@ class phpBBReader(mods.Plugin):
             flen = len(self.parser['entries']) - 1
             self.lastTimeId= time.strptime(self.parser['entries'][flen].updated[:-6],
                                         timeFormat)
-            print "last time set to %s" % self.lastTimeId
+            self.vprint("last time set to %s" % self.lastTimeId)
 
         for entry in self.parser['entries']:
             tmpTime = time.strptime(entry.updated[:-6], timeFormat)
@@ -143,10 +148,10 @@ class phpBBReader(mods.Plugin):
                     del url
 
                 if breakit:
-                    print time.strftime(self.logMessage, time.gmtime()) % {
-                            'name':self.name(),
-                            'message': "post ignored for forum id %d" % fid
-                    }
+                    self.vprint(time.strftime(self.logMessage, time.gmtime()) % {
+                        'name':self.name(),
+                        'message': "post ignored for forum id %d" % fid
+                    })
                     continue
 
             # If we don't have any id in memory, that's because there is no
@@ -155,11 +160,11 @@ class phpBBReader(mods.Plugin):
                 firstId = entry.id
 
 
-            verbose = "Module(%(name)s): New message -> %(url)s" % {
-                                        'name': self.name(),
-                                        'url': entry.link
-                                    }
-            print verbose
+            self.dprint("Module(%(name)s): New message -> %(url)s" % {
+                        'name': self.name(),
+                        'url': entry.link
+            })
+
             entries.append({
                     'author':   entry.author,
                     'link':     entry.link,
@@ -170,7 +175,7 @@ class phpBBReader(mods.Plugin):
         tmpTime = time.strptime(self.parser['entries'][0].updated[:-6], timeFormat)
         if self.lastTimeId != tmpTime:
             self.lastTimeId = tmpTime
-            print "last time set to %s" % self.lastTimeId
+            self.dprint("last time set to %s" % self.lastTimeId)
         del(tmpTime)
 
         if firstId != None:
@@ -212,8 +217,12 @@ class phpBBReader(mods.Plugin):
 
             if threads[p['threadId']] > 1:
                 title = re.search(rawstr, p['title'])
+                if title is None:
+                    title = "[error: empty title]"
+                else:
+                    title = title.group(1)
                 msg.append(multPattern % {'npost': threads[p['threadId']],
-                                          'title': title.group(1),
+                                          'title': title,
                                           'link': threads[p['threadId']+'_l']})
                 threads.update({p['threadId']: None})
             else:
@@ -229,12 +238,12 @@ class phpBBReader(mods.Plugin):
                 rawjson = self.shorten(longurl)
                 result = simplejson.loads(rawjson['result'])
             except JSONDecodeError as strerror:
-                print time.strftime(self.logMessage, time.gmtime()) % {
+                self.vprint(time.strftime(self.logMessage, time.gmtime()) % {
                     'message': "bitly didn't return a json string. Using " \
                             "full url instead.\n" \
                             "JSON error: {0}".format(strerror),
                     'name': self.name()
-                }
+                })
                 return longurl
 
             if result['status_code'] is not 200:

@@ -11,7 +11,7 @@ class Kungfu(mods.Plugin):
 
     logMessage = "%d.%m.%y %H:%M:%S> Module(%(name)s): %(message)s"
 
-    def __init__(self, shedulefn, config):
+    def __init__(self, shedulefn, config={}, verbosity=False):
         self.settings = config
         self._shedulefn = shedulefn
         # this is the irc message body, not the corpse
