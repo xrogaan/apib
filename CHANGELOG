@@ -5,9 +5,11 @@ MAJOR CHANGES:
  * Add a new mod : factoids
 
 MINOR CHANGES:
- * Add a time factor to the phpBB feed parser to keep track of deleted posts
+ * [feedparser] Add a time factor to the phpBB feed parser to keep track of deleted posts
+ * [feedparser] Filter by thread to avoid flood (issue #3)
 
 BUG FIXES:
+ * Remove some crash factor
 
 RELEASE 0.2.0
 CHANGE SINCE 0.1.0
