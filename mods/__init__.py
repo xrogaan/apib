@@ -23,7 +23,7 @@ class Plugin:
         self.verbose(2, msg)
 
     def verbose(self, verbosity, msg):
-        if verbosity >= self.__verbosity:
+        if verbosity <= self.__verbosity:
             print >> self.log,'*' * verbosity, msg
 
     def name(self):
