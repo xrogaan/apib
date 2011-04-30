@@ -34,6 +34,7 @@ class phpBBReader(mods.Plugin):
             verbosity = 5
         else:
             verbosity = 0
+
         mods.Plugin.__init__(self,verbosity)
         self.url = url
         self.delay = delay
@@ -169,7 +170,7 @@ class phpBBReader(mods.Plugin):
                     'author':   entry.author,
                     'link':     entry.link,
                     'title':    entry.title,
-                    'threadId': re.search(topicrawstr, entry.link).group(1)
+                    'threadId': int(re.search(topicrawstr, entry.link).group(1))
                    })
 
         tmpTime = time.strptime(self.parser['entries'][0].updated[:-6], timeFormat)
@@ -202,29 +203,34 @@ class phpBBReader(mods.Plugin):
 
         # building some stats
         threads = {}
+        topicLinks = {}
         for message in messages:
             if threads.has_key(message['threadId']) is False:
                 threads[message['threadId']] = 1
             else:
                 threads[message['threadId']]+= 1
-            topicLinkKey = message['threadId']
-            threads.update({message['threadId'] + '_l': message['link']})
+            topicLinks.update({message['threadId']: message['link']})
 
         rawstr = u'(?x)\s•\s(.*?)$'
+
         for p in messages:
-            if threads[p['threadId']] is None:
+
+            if threads.has_key(p['threadId']) is False:
                 continue
 
             if threads[p['threadId']] > 1:
                 title = re.search(rawstr, p['title'])
+
                 if title is None:
                     title = "[error: empty title]"
                 else:
                     title = title.group(1)
+
                 msg.append(multPattern % {'npost': threads[p['threadId']],
                                           'title': title,
-                                          'link': threads[p['threadId']+'_l']})
-                threads.update({p['threadId']: None})
+                                          'link': topicLinks[p['threadId']]})
+#                threads.update({p['threadId']: None})
+                del(topicLinks[p['threadId']],threads[p['threadId']])
             else:
                 msg.append(pattern % {'author': p['author'],
                                       'title': mods.unescape(p['title']),
