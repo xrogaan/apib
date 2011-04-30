@@ -239,8 +239,8 @@ class Apib(SingleServerIRCBot):
     def m_privmsg(self, messages, target, c):
         messages = messages()
         for msg in messages:
-            print "> Sending message: %s" % msg
-            c.privmsg(target, msg.encode('UTF-8'))
+            print "> Sending message: %s" % msg.encode('UTF-8', 'replace')
+            c.privmsg(target, msg.encode('UTF-8', 'replace'))
             time.sleep(3)
 
     def output(self, message, args):
