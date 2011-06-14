@@ -19,12 +19,13 @@ class Plugin:
 
     def vprint(self, msg):
         self.verbose(1, msg)
+
     def dprint(self, msg):
         self.verbose(2, msg)
 
     def verbose(self, verbosity, msg):
         if verbosity <= self.__verbosity:
-            print >> self.log,'*' * verbosity, msg
+            print >> self._log,'*' * verbosity, msg
 
     def name(self):
         return self.__class__.__name__

@@ -189,12 +189,10 @@ class phpBBReader(mods.Plugin):
 
     def get_scheduled_output(self, url=None, *args):
         messages = self.parse(url)
-        if messages == 1:
-            return None
 
         msg = []
 
-        if len(messages)==0:
+        if len(messages)==0 or messages == 1:
             return msg
 
         pattern = "[off][Forum] %(author)s posted in %(title)s - %(link)s"
