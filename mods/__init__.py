@@ -25,7 +25,7 @@ class Plugin:
 
     def verbose(self, verbosity, msg):
         if verbosity <= self.__verbosity:
-            print >> self._log,'*' * verbosity, msg
+            print >> self.__log,'*' * verbosity, msg
 
     def name(self):
         return self.__class__.__name__
