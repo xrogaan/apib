@@ -7,11 +7,17 @@ import mods.Plugins
 class factoidsLoader(mods.Plugin):
     factoidsFile = 'factoids.yaml'
 
-    def __init__(self, shedulefn, args={}):
+    def __init__(self, shedulefn, args={}, verbosity=False):
         """
         This will simply load the factoids. The yaml file must be in the proper
         format for that. Extra test could be usefull.
         """
+        if verbosity:
+            verbosity = 5
+        else:
+            verbosity = 0
+
+        mods.Plugin.__init__(self, verbosity)
         self._shedulefn = shedulefn
         self._fSpecials = [
                 'add',
