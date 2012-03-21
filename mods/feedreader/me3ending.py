@@ -55,7 +55,10 @@ class me3ending(mods.Plugin):
         if urlData.getcode() != 200:
             self.vprint({'message':"Server not ready. ERRNUM %d" % urlData.getcode()})
             return 1
-        self.assetsPool = eval(urlData.read())
+        rawdata = urlData.read()
+        if '(null)' == rawdata:
+            return 1
+        self.assetsPool = eval(rawdata)
 
         return self.__getMsgs()
 
