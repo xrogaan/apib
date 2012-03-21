@@ -81,11 +81,12 @@ class me3ending(mods.Plugin):
 
     def get_scheduled_output(self, url=None, *args):
         assetList = self.parse(url)
-        msg = ["News from the front !"]
+        msg = []
 
-        if len(assetList) <= 0:
+        if assetList == 1 or len(assetList) <= 0:
             return msg
 
+        msg = ["News from the front !"]
         pattern = "%(country)s sent reinforcement to its %(asset)s, raising " \
                 "its forces of %(points)s."
         patternNew = "%(country)s has got a new asset: %(asset)s"
