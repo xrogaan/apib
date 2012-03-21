@@ -12,7 +12,7 @@ import mods
 class me3ending(mods.Plugins):
     logMessage = "%d.%m.%y %H:%M:%S> Module(%(name)s): %(message)s"
     def __init__(self, shedulefn, delay=300, args={}, verbosity=False):
-        mods.Plugin.__init__(self.verbosity)
+        super(me3ending, self).__init__(verbosity)
         self.apiurl = "http://lugoentertainment.com/me3ending/api.php?get=%d"
         self.delay = delay
         self._shedulefn = shedulefn
@@ -76,7 +76,7 @@ class me3ending(mods.Plugins):
         pattern = "%(country)s sent reinforcement to its %(asset)s, raising " \
                 "its forces of %(points)s."
         patternNew = "%(country)s has got a new asset: %(asset)s"
-        mpattern = "%(country)s has got several reinforcement for " \
+        mpattern = "%(country)s has got several reinforcementis for " \
                 "multiple assets."
         mpatternNew = "%(country)s enlisted several new assets ! Now counts"\
                 "%(newAssets)d more assets in the list."
@@ -105,7 +105,7 @@ class me3ending(mods.Plugins):
                     for asset in assets:
                         msg.append(mpattern % {
                                         'country': country,
-                                        'points': asset['point']
+                                        'points': asset['point'],
                                         'asset': asset['name']
                                         })
         return msg
@@ -114,3 +114,5 @@ class me3ending(mods.Plugins):
         messageDict['name'] = self.name()
         formated = time.strftime(self.logMessage, time.gmtime()) % messageDict
         super(me3ending, self).vprint(formated)
+
+Class=me3ending

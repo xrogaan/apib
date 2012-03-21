@@ -3,7 +3,7 @@
 
 import re
 import htmlentitydefs
-
+import urllib2
 
 class PluginError(Exception):
     """Represent a Plugin Exception"""

@@ -6,6 +6,8 @@ __version__ = 1.0
 __contributors__ = {}
 
 import phpBBReader
+import me3ending
 
-Classes = {'phpBBReader': phpBBReader.Class
+Classes = {'phpBBReader': phpBBReader.Class,
+        'me3ending': me3ending.Class
           }
