@@ -9,7 +9,7 @@ class PluginError(Exception):
     """Represent a Plugin Exception"""
     pass
 
-class Plugin:
+class Plugin(object):
     import sys as __sys
     settings = {}
 
@@ -63,3 +63,8 @@ def unescape(text):
     return re.sub("&#?\w+;", fixup, text)
 
 
+class DontRedirect(urllib2.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        if code in (301, 302, 303, 307):
+            raise urllib2.HTTPError(req.get_full_url(),
+                    code, msg, headers, fp)

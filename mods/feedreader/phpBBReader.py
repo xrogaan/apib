@@ -17,13 +17,6 @@ except ImportError:
 import mods
 
 
-class DontRedirect(urllib2.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        if code in (301, 302, 303, 307):
-            raise urllib2.HTTPError(req.get_full_url(),
-                    code, msg, headers, fp)
-
-
 class phpBBReader(mods.Plugin):
 
     lastId = None
@@ -286,7 +279,7 @@ class phpBBReader(mods.Plugin):
         })
         url = bitly_url + "?%s" % urllib.urlencode(params, doseq=1)
 
-        dont_redirect = DontRedirect()
+        dont_redirect = mods.DontRedirect()
         opener = urllib2.build_opener(dont_redirect)
         opener.addheaders = [('User-agent', user_agent + ' urllib')]
 
