@@ -72,7 +72,7 @@ class me3ending(mods.Plugin):
                 else:
                     entries[country]['updated'].append(asset)
         self.lastTimestamp = int(time.time())
-        with io.open(self.cookiename,'w') as mfile:
+        with io.open(self.cookieName,'w') as mfile:
             mfile.write(unicode(self.lastTimestamp))
         return entries
 
