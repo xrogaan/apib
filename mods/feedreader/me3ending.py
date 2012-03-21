@@ -29,12 +29,12 @@ class me3ending(mods.Plugin):
         else:
             raise mods.PluginError('arguments not configured')
 
-        cookieName = 'me3ending.lasttimestamp'
+        self.cookieName = 'me3ending.lasttimestamp'
         try:
-            with io.open(cookieName,'r') as mfile:
+            with io.open(self.cookieName,'r') as mfile:
                 c = int(mfile.read())
         except IOError, e:
-            with io.open(cookieName,'w') as mfile:
+            with io.open(self.cookieName,'w') as mfile:
                 c = int(time.time())
                 mfile.write(unicode(c))
 
@@ -71,6 +71,9 @@ class me3ending(mods.Plugin):
                     entries[country]['new'].append(asset)
                 else:
                     entries[country]['updated'].append(asset)
+        self.lastTimestamp = int(time.time())
+        with io.open(self.cookiename,'w') as mfile:
+            mfile.write(unicode(self.lastTimestamp))
         return entries
 
     def get_scheduled_output(self, url=None, *args):
