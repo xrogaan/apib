@@ -87,10 +87,10 @@ class me3ending(mods.Plugin):
             return msg
 
         msg = ["News from the front !"]
-        pattern = "%(country)s sent reinforcement to its %(asset)s, raising " \
-                "its forces of %(points)s."
+        pattern = "%(country)s sent reinforcements to its %(asset)s, raising " \
+                "its forces by %(points)s."
         patternNew = "%(country)s has got a new asset: %(asset)s"
-        mpattern = "%(country)s has got several reinforcementis for " \
+        mpattern = "%(country)s has got several reinforcements for " \
                 "multiple assets."
         mpatternNew = "%(country)s enlisted several new assets ! Now counts"\
                 "%(newAssets)d more assets in the list."
