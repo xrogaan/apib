@@ -185,7 +185,7 @@ class phpBBReader(mods.Plugin):
 
         msg = []
 
-        if message ==1 or len(messages)==0:
+        if messages ==1 or len(messages)==0:
             return msg
 
         pattern = "[off][Forum] %(author)s posted in %(title)s - %(link)s"
